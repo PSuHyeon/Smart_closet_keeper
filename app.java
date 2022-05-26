@@ -1,10 +1,8 @@
 package sandbox;
 import lejos.robotics.Color;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap; 
-
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Keys;
 import lejos.hardware.Sound;
@@ -17,7 +15,6 @@ import lejos.hardware.port.SensorPort;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
-
 import java.io.BufferedReader;
 import java.net.HttpURLConnection;
 import java.io.InputStreamReader;
@@ -180,27 +177,27 @@ public class sandbox {
 	       
 	    }
 	    public static String getWeather()throws Exception {
-//	        URL openweatherURL = new URL( "https://api.openweathermap.org/data/2.5/weather?lat=36&lon=127&appid=99162b3225b63083cfc32b51154370bf" );
-//	        HttpURLConnection conn = (HttpURLConnection) openweatherURL.openConnection();
-//	        conn.setRequestMethod("GET");
-//	        conn.setRequestProperty("Content-type", "application/json");
-//	        conn.setDoOutput(true);
-//	        try{
-//	            StringBuffer sb = new StringBuffer();
-//	            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-//	            String temp = " "; 
-//	            while(br.ready()) {
-//	                sb.append(br.readLine());
-//	                int weatherStartIndex = sb.indexOf("main") + 7; 
-//	                int weatherEndIndex = weatherStartIndex + sb.substring(weatherStartIndex).indexOf('"');
-//	                temp = sb.substring(weatherStartIndex, weatherEndIndex);
-//	            }
-//	            conn.disconnect();
-//	            return temp;
-//	        }catch(Exception e) {
-//	            e.printStackTrace();
-//	            return " ";
-//	        }
+	        URL openweatherURL = new URL( "https://api.openweathermap.org/data/2.5/weather?lat=36&lon=127&appid=99162b3225b63083cfc32b51154370bf" );
+	        HttpURLConnection conn = (HttpURLConnection) openweatherURL.openConnection();
+	        conn.setRequestMethod("GET");
+	        conn.setRequestProperty("Content-type", "application/json");
+	        conn.setDoOutput(true);
+	        try{
+	            StringBuffer sb = new StringBuffer();
+	            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+	            String temp = " "; 
+	            while(br.ready()) {
+	                sb.append(br.readLine());
+	                int weatherStartIndex = sb.indexOf("main") + 7; 
+	                int weatherEndIndex = weatherStartIndex + sb.substring(weatherStartIndex).indexOf('"');
+	                temp = sb.substring(weatherStartIndex, weatherEndIndex);
+	            }
+	            conn.disconnect();
+	            return temp;
+	        }catch(Exception e) {
+	            e.printStackTrace();
+	            return " ";
+	        }
 	    	return "Clear";
 	    }
 }
