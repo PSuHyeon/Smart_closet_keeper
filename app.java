@@ -1,8 +1,10 @@
 package sandbox;
 import lejos.robotics.Color;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap; 
+
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Keys;
 import lejos.hardware.Sound;
@@ -15,12 +17,14 @@ import lejos.hardware.port.SensorPort;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
+
 import java.io.BufferedReader;
 import java.net.HttpURLConnection;
 import java.io.InputStreamReader;
 import java.net.URL;
 
 public class sandbox {
+	
 		private static EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
 		private static EV3TouchSensor escapeTouch = new EV3TouchSensor(SensorPort.S3);
 	    public static int curState; //옷 class 저장
@@ -32,19 +36,27 @@ public class sandbox {
 	    private static EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort.S2);
 	    public static ArrayList<Integer> DcolorList = new ArrayList<Integer>(Arrays.asList(Color.BLACK, Color.BLUE, Color.CYAN, Color.BROWN, Color.DARK_GRAY,Color.GRAY));
 	    public static ArrayList<Integer> LcolorList = new ArrayList<Integer>(Arrays.asList(Color.LIGHT_GRAY, Color.NONE, Color.MAGENTA, Color.ORANGE,Color.PINK,Color.RED, Color.WHITE,Color.YELLOW));
-        	  
-	    public static void fold(){	
+        
+	    
+		
+	  
+	    public static void fold(){
+			
+			
+			
 			RegulatedMotor leftMotor = Motor.A;
 		    RegulatedMotor rightMotor = Motor.B;
 		    RegulatedMotor centerMotor = Motor.C;
 		    int armSpeed = 1080;
+		    int armDownSpeed = 100;
 		    int tailSpeed = 1080;
-		    int armLUpDelay = 360;
-		    int armLDownDelay = 330;
+		    int tailDownSpeed = 100;
+		    int armLUpDelay = 350;
+		    int armLDownDelay = 1700;
 		    int armRUpDelay = 330;
-		    int armRDownDelay = 300;
-		    int tailUpDelay = 300;
-		    int tailDownDelay = 300;
+		    int armRDownDelay = 1700;
+		    int tailUpDelay = 1300;
+		    int tailDownDelay = 2000;
 		    Sound.playNote(Sound.PIANO, 523, 1000);
 		    
 			do{
@@ -58,13 +70,21 @@ public class sandbox {
 			    leftMotor.forward();
 			    Delay.msDelay(armLUpDelay);
 			    leftMotor.stop();
+			    
+				leftMotor.setSpeed(armDownSpeed);
+			    
 			    leftMotor.backward();
 			    Delay.msDelay(armLDownDelay);
 			    leftMotor.stop();
 			    
+				leftMotor.setSpeed(armSpeed);
+			    
 			    rightMotor.forward();
 			    Delay.msDelay(armRUpDelay);
 			    rightMotor.stop();
+			    
+			    rightMotor.setSpeed(armDownSpeed);
+			    
 			    rightMotor.backward();
 			    Delay.msDelay(armRDownDelay);
 			    rightMotor.stop();
@@ -74,9 +94,16 @@ public class sandbox {
 			    centerMotor.forward();
 			    Delay.msDelay(tailUpDelay);
 			    centerMotor.stop();
+			    
+			    centerMotor.setSpeed(tailDownSpeed);
+			    
 			    centerMotor.backward();
 			    Delay.msDelay(tailDownDelay);
 			    centerMotor.stop();
+			    
+				leftMotor.setSpeed(armSpeed);
+			    rightMotor.setSpeed(armSpeed);
+			    centerMotor.setSpeed(tailSpeed);
 			    
 			}while(true);
 		}
@@ -201,5 +228,3 @@ public class sandbox {
 	    	return "Clear";
 	    }
 }
-
-
