@@ -24,11 +24,21 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 public class sandbox {
-	
+
+		public class Clothes{
+			public int color;
+			public int type;
+
+			public Clothes(int color, int type){
+				this.color = color;
+				this.type = type;
+			}
+		}
+		
 		private static EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
 		private static EV3TouchSensor escapeTouch = new EV3TouchSensor(SensorPort.S3);
 	    public static int curState; //옷 class 저장
-	    public static ArrayList<Integer> clothList = new ArrayList<Integer>();
+	    public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
 	    public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
 	    public static int mode = 0;
 	    public static EV3 ev3 = (EV3) BrickFinder.getLocal();
@@ -89,7 +99,7 @@ public class sandbox {
 			    Delay.msDelay(armRDownDelay);
 			    rightMotor.stop();
 			    
-			    clothList.add(getColor());
+			    clothList.add(Clothes(getColor(), curstate));
 			    
 			    centerMotor.forward();
 			    Delay.msDelay(tailUpDelay);
@@ -177,31 +187,328 @@ public class sandbox {
 	    public static int detected(){ //옷이 detect 됨
 	        //상의면 1 하의면 2 detected 안되면 0
 	        //이게 ML 사용하는거
+			
 	        return 1;
 	    }
 	    
 	    public static void recommend() throws Exception{
 	        int temp = weatherMap.get(getWeather());
-	        System.out.printf("size of colorlist = %d",clothList.size());
-	        System.out.printf("size of colorlist = %d",clothList.get(0));
-	        if (temp >= 5)
-	        {
-	            for(int i = 0; i<clothList.size();i++){
-	                if (LcolorList.contains(clothList.get(i))){
-	                    System.out.printf("%s",clothList.get(i));
-	                }
-	            }
-	        }
-	        if (temp < 5)
-	        {
-	            for(int i = 0; i<clothList.size();i++){
-	                if (DcolorList.contains(clothList.get(i))){
-	                    System.out.printf("%s",clothList.get(i));
-	                }
-	            }
-	        }
-	        
-	       
+	        int uprecommend = 0;
+			int downrecommend = 0;
+	        if (temp == 0){
+				for (int i = 0; i<clothList.size(); i++){
+					if (clothList.get(i).type == 1){
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.BLUE ){
+							System.out.print("recommending blue shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray shirt");
+							uprecommend = 1;
+						}
+						else if (upcolor == Color.WHITE){
+							System.out.print("recommending white shirt");
+							uprecommend = 1;
+						}
+					}
+					else{
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.BROWN ){
+							System.out.print("recommending brown pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray pants");
+							downrecommend = 1;
+						}
+						else if (upcolor == Color.BLUE){
+							System.out.print("recommending blue pants");
+							downrecommend = 1;
+						}
+					}
+					if (uprecommend && downrecommend){
+						return;
+					}
+				}
+			}
+			if (temp == 1){ //Drizzle
+				for (int i = 0; i<clothList.size(); i++){
+					if (clothList.get(i).type == 1){
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.BLUE ){
+							System.out.print("recommending blue shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray shirt");
+							uprecommend = 1;
+						}
+						else if (upcolor == Color.WHITE){
+							System.out.print("recommending white shirt");
+							uprecommend = 1;
+						}
+					}
+					else{
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.BLUE ){
+							System.out.print("recommending blue pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray pants");
+							downrecommend = 1;
+						}
+					}
+					if (uprecommend && downrecommend){
+						return;
+					}
+				}
+			}
+
+			if (temp == 2){ //Rain
+				for (int i = 0; i<clothList.size(); i++){
+					if (clothList.get(i).type == 1){
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.BLUE ){
+							System.out.print("recommending blue shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray shirt");
+							uprecommend = 1;
+						}
+						else if (upcolor == Color.WHITE){
+							System.out.print("recommending white shirt");
+							uprecommend = 1;
+						}
+					}
+					else{
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray pants");
+							downrecommend = 1;
+						}
+						else if (upcolor == Color.BLUE){
+							System.out.print("recommending blue pants");
+							downrecommend = 1;
+						}
+					}
+					if (uprecommend && downrecommend){
+						return;
+					}
+				}
+			}
+			if (temp == 3){ //Snow
+				for (int i = 0; i<clothList.size(); i++){
+					if (clothList.get(i).type == 1){
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.BLUE ){
+							System.out.print("recommending blue shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray shirt");
+							uprecommend = 1;
+						}
+						else if (upcolor == Color.WHITE){
+							System.out.print("recommending white shirt");
+							uprecommend = 1;
+						}
+					}
+					else{
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.BROWN ){
+							System.out.print("recommending brown pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray pants");
+							downrecommend = 1;
+						}
+						else if (upcolor == Color.BLUE){
+							System.out.print("recommending blue pants");
+							downrecommend = 1;
+						}
+					}
+					if (uprecommend && downrecommend){
+						return;
+					}
+				}
+			}
+
+			if (temp == 4){ //Atmosphere
+				for (int i = 0; i<clothList.size(); i++){
+					if (clothList.get(i).type == 1){
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.GREEN){
+							System.out.print("recommending blue shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray shirt");
+							uprecommend = 1;
+						}
+						else if (upcolor == Color.WHITE){
+							System.out.print("recommending white shirt");
+							uprecommend = 1;
+						}
+					}
+					else{
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending brown pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray pants");
+							downrecommend = 1;
+						}
+						else if (upcolor == Color.BLUE){
+							System.out.print("recommending blue pants");
+							downrecommend = 1;
+						}
+					}
+					if (uprecommend && downrecommend){
+						return;
+					}
+				}
+			}
+
+			if (temp == 5){ //clear
+				for (int i = 0; i<clothList.size(); i++){
+					if (clothList.get(i).type == 1){
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.YELLOW){
+							System.out.print("recommending yellow shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.BLUE ){
+							System.out.print("recommending blue shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.BROWN ){
+							System.out.print("recommending brown shirt");
+							uprecommend = 1;
+						}
+						else if (upcolor == Color.WHITE){
+							System.out.print("recommending white shirt");
+							uprecommend = 1;
+						}
+					}
+					else{
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.BROWN ){
+							System.out.print("recommending brown pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray pants");
+							downrecommend = 1;
+						}
+						else if (upcolor == Color.BLUE){
+							System.out.print("recommending blue pants");
+							downrecommend = 1;
+						}
+					}
+					if (uprecommend && downrecommend){
+						return;
+					}
+				}
+			}
+			if (temp == 6){ //clouds
+				for (int i = 0; i<clothList.size(); i++){
+					if (clothList.get(i).type == 1){
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.BLUE ){
+							System.out.print("recommending blue shirt");
+							uprecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray shirt");
+							uprecommend = 1;
+						}
+						else if (upcolor == Color.WHITE){
+							System.out.print("recommending white shirt");
+							uprecommend = 1;
+						}
+					}
+					else{
+						int upcolor = clothList.get(i).color;
+						if (upcolor == Color.BLACK){
+							System.out.print("recommending black pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.BROWN ){
+							System.out.print("recommending brown pants");
+							downrecommend = 1;
+						}
+						else if( upcolor == Color.GRAY ){
+							System.out.print("recommending gray pants");
+							downrecommend = 1;
+						}
+						else if (upcolor == Color.BLUE){
+							System.out.print("recommending blue pants");
+							downrecommend = 1;
+						}
+					}
+					if (uprecommend && downrecommend){
+						return;
+					}
+				}
+			}
+			System.out.println("no suitable recommendation");
+			System.out.println("recommending random clothes...");
+			System.out.println("recommending white shirt");
+			System.out.println("recommending black pants");
 	    }
 	    public static String getWeather()throws Exception {
 	        URL openweatherURL = new URL( "https://api.openweathermap.org/data/2.5/weather?lat=36&lon=127&appid=99162b3225b63083cfc32b51154370bf" );
