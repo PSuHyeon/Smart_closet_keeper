@@ -29,43 +29,41 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.io.File;
+
 
 public class ev3Client {
+	public static class Clothes{
+		public int color;
+        public int type;
 
-      public static class Clothes{
-         public int color;
-         public int type;
-
-         Clothes(int color, int type){
-            this.color = color;
+        Clothes(int color, int type){
+        	this.color = color;
             this.type = type;
          }
       }
       
-      private static EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
-      private static EV3TouchSensor escapeTouch = new EV3TouchSensor(SensorPort.S3);
-       public static int curState; //옷 class 저장
-       public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
-       public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
-       public static int mode = 0;
-       public static EV3 ev3 = (EV3) BrickFinder.getLocal();
-       public static Keys keys = ev3.getKeys();
-       private static EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort.S2);
-       public static ArrayList<Integer> DcolorList = new ArrayList<Integer>(Arrays.asList(Color.BLACK, Color.BLUE, Color.CYAN, Color.BROWN, Color.DARK_GRAY,Color.GRAY));
-       public static ArrayList<Integer> LcolorList = new ArrayList<Integer>(Arrays.asList(Color.LIGHT_GRAY, Color.NONE, Color.MAGENTA, Color.ORANGE,Color.PINK,Color.RED, Color.WHITE,Color.YELLOW));
-        static TextLCD lcd = ev3.getTextLCD();
-        public static String serverAddress = "10.0.1.12";
-       public static int serverPort = 8040;
-        public static Socket socket = null;
-        public static DataOutputStream streamOut = null;
-        public static DataInputStream streamIn = null;
+	private static EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
+	private static EV3TouchSensor escapeTouch = new EV3TouchSensor(SensorPort.S3);
+	public static int curState; //옷 class 저장
+	public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
+	public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
+	public static int mode = 0;
+	public static EV3 ev3 = (EV3) BrickFinder.getLocal();
+	public static Keys keys = ev3.getKeys();
+	private static EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort.S2);
+	public static ArrayList<Integer> DcolorList = new ArrayList<Integer>(Arrays.asList(Color.BLACK, Color.BLUE, Color.CYAN, Color.BROWN, Color.DARK_GRAY,Color.GRAY));
+	public static ArrayList<Integer> LcolorList = new ArrayList<Integer>(Arrays.asList(Color.LIGHT_GRAY, Color.NONE, Color.MAGENTA, Color.ORANGE,Color.PINK,Color.RED, Color.WHITE,Color.YELLOW));
+	static TextLCD lcd = ev3.getTextLCD();
+	public static String serverAddress = "10.0.1.12";
+	public static int serverPort = 8040;
+	public static Socket socket = null;
+	public static DataOutputStream streamOut = null;
+	public static DataInputStream streamIn = null;
       
      
-       public static void fold(){
-         
-         
-         
-         RegulatedMotor leftMotor = Motor.A;
+	public static void fold(){   
+          RegulatedMotor leftMotor = Motor.A;
           RegulatedMotor rightMotor = Motor.B;
           RegulatedMotor centerMotor = Motor.C;
           int armSpeed = 1080;
@@ -78,11 +76,14 @@ public class ev3Client {
           int armRDownDelay = 1700;
           int tailUpDelay = 1300;
           int tailDownDelay = 2000;
-          Sound.playNote(Sound.PIANO, 523, 1000);
+ 
           
          do{
             int temp = selectMode();
             if (temp == 1) break;
+            
+            File file1=new File("folding.wav");
+            Sound.playSample(file1, Sound.VOL_MAX);   
             
             leftMotor.setSpeed(armSpeed);
              rightMotor.setSpeed(armSpeed);
@@ -129,9 +130,9 @@ public class ev3Client {
          }while(true);
       }
        public static void main(String arg[]) throws Exception{
-
+           File file2=new File("intro.wav");
+           Sound.playSample(file2, Sound.VOL_MAX); 
             //모드 저장
-
            while (true){
               
                //1번 모드선택 //2번째가 main function return 하는거//3번째가 fold function return하는거
@@ -194,11 +195,13 @@ public class ev3Client {
              Delay.msDelay(100);
           }
          if(etouchValue[0] != 0.0){
-            Sound.playNote(Sound.FLUTE, 1000, 1000);
+            File file3=new File("recommend_mode.wav");
+            Sound.playSample(file3, Sound.VOL_MAX); 
             return 1;
          }
          else {
-            Sound.playNote(Sound.FLUTE, 300, 1000);
+            File file4=new File("folding_mode.wav");
+            Sound.playSample(file4, Sound.VOL_MAX); 
             return 0;
          }
        }
@@ -563,8 +566,5 @@ public class ev3Client {
                  lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
               }
            return recvM;
-       }
-       
-       
-       
+       }      
 }
