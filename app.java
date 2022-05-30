@@ -224,12 +224,12 @@ public class ev3Client {
              Delay.msDelay(100);
           }
          if(etouchValue[0] != 0.0){
-            File file3=new File("recommend_mode.wav"); //termination
+            File file3=new File("recommend_mode.wav"); //exit program
             Sound.playSample(file3, Sound.VOL_MAX); 
             return 1;
          }
          else {
-            File file4=new File("folding_mode.wav"); //restart
+            File file4=new File("folding_mode.wav"); //restart program
             Sound.playSample(file4, Sound.VOL_MAX); 
             return 0;
          }
