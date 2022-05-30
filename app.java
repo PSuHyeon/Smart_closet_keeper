@@ -79,7 +79,7 @@ public class ev3Client {
  
           
          do{
-            int temp = selectMode();
+            int temp = confold();
             if (temp == 1) break;
             
             File file1=new File("folding.wav");
@@ -136,7 +136,7 @@ public class ev3Client {
            while (true){
               
                //1번 모드선택 //2번째가 main function return 하는거//3번째가 fold function return하는거
-              if (selectMode() == 1) {
+              if (execute() == 1) {
                   if (socket != null) socket.close();
                   if(streamOut != null) streamOut.close();
                   if (streamIn != null) streamIn.close();
@@ -177,7 +177,7 @@ public class ev3Client {
           return color_sensor.getColorID();
        }
 
-       public static int selectMode(){ //1 이면 recommend, 2 이면 fold, 0이면 아직 안고른거
+       public static int selectMode(){ //
           final SampleProvider sp = touch.getTouchMode();
          final SampleProvider esp = escapeTouch.getTouchMode();
          float[] touchValue = new float[touch.sampleSize()];
@@ -201,6 +201,63 @@ public class ev3Client {
          }
          else {
             File file4=new File("folding_mode.wav");
+            Sound.playSample(file4, Sound.VOL_MAX); 
+            return 0;
+         }
+       }
+
+       public static int execute(){ //
+          final SampleProvider sp = touch.getTouchMode();
+         final SampleProvider esp = escapeTouch.getTouchMode();
+         float[] touchValue = new float[touch.sampleSize()];
+         float[] etouchValue = new float[escapeTouch.sampleSize()];
+         sp.fetchSample(touchValue, 0)   ;
+         esp.fetchSample(etouchValue, 0);
+         touchValue = new float[touch.sampleSize()];
+         etouchValue = new float[escapeTouch.sampleSize()];
+         sp.fetchSample(touchValue, 0);
+         esp.fetchSample(etouchValue, 0);
+         while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
+             sp.fetchSample(touchValue, 0);
+             
+             esp.fetchSample(etouchValue, 0);
+             Delay.msDelay(100);
+          }
+         if(etouchValue[0] != 0.0){
+            File file3=new File("recommend_mode.wav"); //termination
+            Sound.playSample(file3, Sound.VOL_MAX); 
+            return 1;
+         }
+         else {
+            File file4=new File("folding_mode.wav"); //restart
+            Sound.playSample(file4, Sound.VOL_MAX); 
+            return 0;
+         }
+       }
+       public static int contfold(){ //
+          final SampleProvider sp = touch.getTouchMode();
+         final SampleProvider esp = escapeTouch.getTouchMode();
+         float[] touchValue = new float[touch.sampleSize()];
+         float[] etouchValue = new float[escapeTouch.sampleSize()];
+         sp.fetchSample(touchValue, 0)   ;
+         esp.fetchSample(etouchValue, 0);
+         touchValue = new float[touch.sampleSize()];
+         etouchValue = new float[escapeTouch.sampleSize()];
+         sp.fetchSample(touchValue, 0);
+         esp.fetchSample(etouchValue, 0);
+         while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
+             sp.fetchSample(touchValue, 0);
+             
+             esp.fetchSample(etouchValue, 0);
+             Delay.msDelay(100);
+          }
+         if(etouchValue[0] != 0.0){
+            File file3=new File("recommend_mode.wav"); //finish folding
+            Sound.playSample(file3, Sound.VOL_MAX); 
+            return 1;
+         }
+         else {
+            File file4=new File("folding_mode.wav"); //continue folding
             Sound.playSample(file4, Sound.VOL_MAX); 
             return 0;
          }
