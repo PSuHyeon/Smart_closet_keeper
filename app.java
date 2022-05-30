@@ -161,15 +161,14 @@ public class ev3Client {
          }
       }
 
+      public static int getColor() {
+         int temp = color_sensor.getColorID();
+         System.out.printf(" \n color id is = %d \n", temp);
+         return color_sensor.getColorID();
+      }
 
-       public static int getColor(){
-          int temp = color_sensor.getColorID();
-          System.out.printf(" \n color id is = %d \n", temp);
-          return color_sensor.getColorID();
-       }
-
-       public static int selectMode(){ //
-          final SampleProvider sp = touch.getTouchMode();
+       public static int selectMode() {
+         final SampleProvider sp = touch.getTouchMode();
          final SampleProvider esp = escapeTouch.getTouchMode();
          float[] touchValue = new float[touch.sampleSize()];
          float[] etouchValue = new float[escapeTouch.sampleSize()];
@@ -184,7 +183,7 @@ public class ev3Client {
              
              esp.fetchSample(etouchValue, 0);
              Delay.msDelay(100);
-          }
+         }
          if(etouchValue[0] != 0.0){
             File file3=new File("recommend_mode.wav");
             Sound.playSample(file3, Sound.VOL_MAX); 
@@ -195,10 +194,10 @@ public class ev3Client {
             Sound.playSample(file4, Sound.VOL_MAX); 
             return 0;
          }
-       }
+      }
 
-       public static int execute(){ //
-          final SampleProvider sp = touch.getTouchMode();
+      public static int execute(){ //
+         final SampleProvider sp = touch.getTouchMode();
          final SampleProvider esp = escapeTouch.getTouchMode();
          float[] touchValue = new float[touch.sampleSize()];
          float[] etouchValue = new float[escapeTouch.sampleSize()];
@@ -209,11 +208,10 @@ public class ev3Client {
          sp.fetchSample(touchValue, 0);
          esp.fetchSample(etouchValue, 0);
          while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
-             sp.fetchSample(touchValue, 0);
-             
-             esp.fetchSample(etouchValue, 0);
-             Delay.msDelay(100);
-          }
+            sp.fetchSample(touchValue, 0);      
+            esp.fetchSample(etouchValue, 0);
+            Delay.msDelay(100);
+         }
          if(etouchValue[0] != 0.0){
             File file3=new File("recommend_mode.wav"); //exit program
             Sound.playSample(file3, Sound.VOL_MAX); 
@@ -224,9 +222,9 @@ public class ev3Client {
             Sound.playSample(file4, Sound.VOL_MAX); 
             return 0;
          }
-       }
-       public static int contfold(){ //
-          final SampleProvider sp = touch.getTouchMode();
+      }
+      public static int contfold(){ //
+         final SampleProvider sp = touch.getTouchMode();
          final SampleProvider esp = escapeTouch.getTouchMode();
          float[] touchValue = new float[touch.sampleSize()];
          float[] etouchValue = new float[escapeTouch.sampleSize()];
@@ -237,11 +235,10 @@ public class ev3Client {
          sp.fetchSample(touchValue, 0);
          esp.fetchSample(etouchValue, 0);
          while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
-             sp.fetchSample(touchValue, 0);
-             
-             esp.fetchSample(etouchValue, 0);
-             Delay.msDelay(100);
-          }
+            sp.fetchSample(touchValue, 0);       
+            esp.fetchSample(etouchValue, 0);
+            Delay.msDelay(100);
+         }
          if(etouchValue[0] != 0.0){
             File file3=new File("recommend_mode.wav"); //finish folding
             Sound.playSample(file3, Sound.VOL_MAX); 
@@ -252,21 +249,20 @@ public class ev3Client {
             Sound.playSample(file4, Sound.VOL_MAX); 
             return 0;
          }
-       }
+      }
 
-       public static int detected(){ //옷이 detect 됨
-           //상의면 1 하의면 2 detected 안되면 0
-           //이게 ML 사용하는거
-         
-           return 1;
-       }
+      public static int detected(){ //옷이 detect 됨
+         //상의면 1 하의면 2 detected 안되면 0
+         //이게 ML 사용하는거 
+         return 1;
+      }
        
-       public static void recommend() throws Exception{
-           int temp = weatherMap.get(getWeather());
-           int uprecommend = 0;
+      public static void recommend() throws Exception{
+         int temp = weatherMap.get(getWeather());
+         int uprecommend = 0;
          int downrecommend = 0;
-           if (temp == 0){
-           System.out.println("Recommendation: ");
+         if (temp == 0){
+            System.out.println("Recommendation: ");
             for (int i = 0; i<clothList.size(); i++){
                if (clothList.get(i).type == 1){
                   int upcolor = clothList.get(i).color;
@@ -310,7 +306,7 @@ public class ev3Client {
                   return;
                }
             }
-         }
+         }  
          if (temp == 1){ //Drizzle
             for (int i = 0; i<clothList.size(); i++){
                if (clothList.get(i).type == 1){
@@ -601,18 +597,18 @@ public class ev3Client {
            String recvM = "";
            int cnt =0;
               try{
-                 cnt += 1;
-                 sendM = "fuck this up" + cnt;
-                 streamOut.writeUTF(sendM);
-                 streamOut.flush();
+                  cnt += 1;
+                  sendM = "fuck this up" + cnt;
+                  streamOut.writeUTF(sendM);
+                  streamOut.flush();
                  
-                 recvM = streamIn.readUTF();
-                 System.out.printf("weather is %s", recvM);
+                  recvM = streamIn.readUTF();
+                  System.out.printf("weather is %s", recvM);
                  
-              Thread.sleep(1000);
-              }catch(IOException ioe){
+                  Thread.sleep(1000);
+               } catch(IOException ioe){
                  lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
-              }
-           return recvM;
+               }
+            return recvM;
        }      
 }
