@@ -1,10 +1,5 @@
 package ev3Client;
 import lejos.robotics.Color;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap; 
-
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Keys;
 import lejos.hardware.Sound;
@@ -18,7 +13,9 @@ import lejos.hardware.port.SensorPort;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap; 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -31,17 +28,18 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.io.File;
 
-
 public class ev3Client {
-	public static class Clothes{
-		public int color;
-        public int type;
+	public static class Clothes {
 
-        Clothes(int color, int type){
-        	this.color = color;
-            this.type = type;
-         }
+		public int color;
+      public int type;
+
+      Clothes(int color, int type){
+         this.color = color;
+         this.type = type;
       }
+
+   }
       
 	private static EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
 	private static EV3TouchSensor escapeTouch = new EV3TouchSensor(SensorPort.S3);
@@ -61,7 +59,6 @@ public class ev3Client {
 	public static DataOutputStream streamOut = null;
 	public static DataInputStream streamIn = null;
       
-     
 	public static void fold(){   
           RegulatedMotor leftMotor = Motor.A;
           RegulatedMotor rightMotor = Motor.B;
@@ -76,8 +73,7 @@ public class ev3Client {
           int armRDownDelay = 1700;
           int tailUpDelay = 1300;
           int tailDownDelay = 2000;
- 
-          
+  
          do{
             int temp = confold();
             if (temp == 1) break;
@@ -86,89 +82,84 @@ public class ev3Client {
             Sound.playSample(file1, Sound.VOL_MAX);   
             
             leftMotor.setSpeed(armSpeed);
-             rightMotor.setSpeed(armSpeed);
-             centerMotor.setSpeed(tailSpeed);
+            rightMotor.setSpeed(armSpeed);
+            centerMotor.setSpeed(tailSpeed);
              
-             leftMotor.forward();
-             Delay.msDelay(armLUpDelay);
-             leftMotor.stop();
+            leftMotor.forward();
+            Delay.msDelay(armLUpDelay);
+            leftMotor.stop();
              
             leftMotor.setSpeed(armDownSpeed);
              
-             leftMotor.backward();
-             Delay.msDelay(armLDownDelay);
-             leftMotor.stop();
-             
+            leftMotor.backward();
+            Delay.msDelay(armLDownDelay);
+            leftMotor.stop();
+            
             leftMotor.setSpeed(armSpeed);
              
-             rightMotor.forward();
-             Delay.msDelay(armRUpDelay);
-             rightMotor.stop();
+            rightMotor.forward();
+            Delay.msDelay(armRUpDelay);
+            rightMotor.stop();
+            
+            rightMotor.setSpeed(armDownSpeed);
              
-             rightMotor.setSpeed(armDownSpeed);
+            rightMotor.backward();
+            Delay.msDelay(armRDownDelay);
+            rightMotor.stop();
+            
+            clothList.add(new Clothes(getColor(), curState));
              
-             rightMotor.backward();
-             Delay.msDelay(armRDownDelay);
-             rightMotor.stop();
+            centerMotor.forward();
+            Delay.msDelay(tailUpDelay);
+            centerMotor.stop();
              
-             clothList.add(new Clothes(getColor(), curState));
+            centerMotor.setSpeed(tailDownSpeed);
              
-             centerMotor.forward();
-             Delay.msDelay(tailUpDelay);
-             centerMotor.stop();
-             
-             centerMotor.setSpeed(tailDownSpeed);
-             
-             centerMotor.backward();
-             Delay.msDelay(tailDownDelay);
-             centerMotor.stop();
-             
+            centerMotor.backward();
+            Delay.msDelay(tailDownDelay);
+            centerMotor.stop();
+            
             leftMotor.setSpeed(armSpeed);
-             rightMotor.setSpeed(armSpeed);
-             centerMotor.setSpeed(tailSpeed);
-             
-         }while(true);
+            rightMotor.setSpeed(armSpeed);
+            centerMotor.setSpeed(tailSpeed);
+            
+         } while(true);
       }
-       public static void main(String arg[]) throws Exception{
-           File file2=new File("intro.wav");
-           Sound.playSample(file2, Sound.VOL_MAX); 
-            //모드 저장
-           while (true){
-              
-               //1번 모드선택 //2번째가 main function return 하는거//3번째가 fold function return하는거
-              if (execute() == 1) {
-                  if (socket != null) socket.close();
-                  if(streamOut != null) streamOut.close();
-                  if (streamIn != null) streamIn.close();
-                 break;
-              }
-              mode = selectMode();
-               if (mode == 1){
-                  recommend();
-                   continue; 
-                   //recommend
-               }
-               else {
-                      
-                    curState = detected(); //카메라가 상의 하의 or detect 못함. 상의는 1 하의는 2 없으면 0
+      public static void main(String arg[]) throws Exception{
+         File file2=new File("intro.wav");
+         Sound.playSample(file2, Sound.VOL_MAX); 
+         //모드 저장
+         while (true){ 
+            //1번 모드선택 //2번째가 main function return 하는거//3번째가 fold function return하는거
+            if (execute() == 1) {
+               if (socket != null) socket.close();
+               if(streamOut != null) streamOut.close();
+               if (streamIn != null) streamIn.close();
+               break;
+            }
+            mode = selectMode();
+            if (mode == 1){
+               recommend();
+               continue; 
+               //recommend
+            }
+            else {          
+               curState = detected(); //카메라가 상의 하의 or detect 못함. 상의는 1 하의는 2 없으면 0
 
-                    if (curState == 0){
-                           continue;
-                    }
-                    else if (curState == 1){
-                           fold();
-                           
-                    }
-                    else{
-                           //원래 있던 fold 함수 바지로 바꾼거
-                      fold();
-                    }
-                   
+               if (curState == 0){
+                  continue;
                }
-              // mode = 0; //mode 다시 초기화 unreachable error 땜에 잠시 주석처리
-           }
-          
-       }
+               else if (curState == 1){
+                  fold();            
+               }
+               else{
+                  //원래 있던 fold 함수 바지로 바꾼거
+                  fold();
+               }       
+            }
+            // mode = 0; //mode 다시 초기화 unreachable error 땜에 잠시 주석처리
+         }
+      }
 
 
        public static int getColor(){
