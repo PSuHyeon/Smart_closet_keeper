@@ -14,6 +14,12 @@ import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 import java.util.ArrayList;
+
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3IRSensor;
+import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
+
 import java.util.Arrays;
 import java.util.HashMap; 
 import java.io.BufferedInputStream;
@@ -27,11 +33,15 @@ import java.net.UnknownHostException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.io.File;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3IRSensor;
+import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class ev3Client {
-	public static class Clothes {
+   public static class Clothes {
 
-		public int color;
+      public int color;
       public int type;
 
       Clothes(int color, int type){
@@ -39,26 +49,25 @@ public class ev3Client {
          this.type = type;
       }
    }
+   public static int curState; //옷 class 저장
+   public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
+   public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
+   public static int mode = 0;
+   public static EV3 ev3 = (EV3) BrickFinder.getLocal();
+   public static Keys keys = ev3.getKeys();
+   private static EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort.S3);
+   private static EV3ColorSensor color_sensor2 = new EV3ColorSensor(SensorPort.S4);
+   public static ArrayList<Integer> DcolorList = new ArrayList<Integer>(Arrays.asList(Color.BLACK, Color.BLUE, Color.CYAN, Color.BROWN, Color.DARK_GRAY,Color.GRAY));
+   public static ArrayList<Integer> LcolorList = new ArrayList<Integer>(Arrays.asList(Color.LIGHT_GRAY, Color.NONE, Color.MAGENTA, Color.ORANGE,Color.PINK,Color.RED, Color.WHITE,Color.YELLOW));
+   static TextLCD lcd = ev3.getTextLCD();
+   public static String serverAddress = "10.0.1.12";
+   public static int serverPort = 8040;
+   public static Socket socket = null;
+   public static DataOutputStream streamOut = null;
+   public static DataInputStream streamIn = null;
+   public static EV3IRSensor infraredSensor = new EV3IRSensor(SensorPort.S2);
       
-	private static EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
-	private static EV3TouchSensor escapeTouch = new EV3TouchSensor(SensorPort.S3);
-	public static int curState; //옷 class 저장
-	public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
-	public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
-	public static int mode = 0;
-	public static EV3 ev3 = (EV3) BrickFinder.getLocal();
-	public static Keys keys = ev3.getKeys();
-	private static EV3ColorSensor color_sensor = new EV3ColorSensor(SensorPort.S2);
-	public static ArrayList<Integer> DcolorList = new ArrayList<Integer>(Arrays.asList(Color.BLACK, Color.BLUE, Color.CYAN, Color.BROWN, Color.DARK_GRAY,Color.GRAY));
-	public static ArrayList<Integer> LcolorList = new ArrayList<Integer>(Arrays.asList(Color.LIGHT_GRAY, Color.NONE, Color.MAGENTA, Color.ORANGE,Color.PINK,Color.RED, Color.WHITE,Color.YELLOW));
-	static TextLCD lcd = ev3.getTextLCD();
-	public static String serverAddress = "10.0.1.12";
-	public static int serverPort = 8040;
-	public static Socket socket = null;
-	public static DataOutputStream streamOut = null;
-	public static DataInputStream streamIn = null;
-      
-	public static void fold(){   
+   public static void fold(){   
           RegulatedMotor leftMotor = Motor.A;
           RegulatedMotor rightMotor = Motor.B;
           RegulatedMotor centerMotor = Motor.C;
@@ -75,8 +84,8 @@ public class ev3Client {
           int tailDownDelay = 2000;
   
          do{
-            int temp = confold();
-            if (temp == 1) break;
+            int temp = contfold();
+            if (temp == 3) break;
             
             File file1=new File("folding.wav");
             Sound.playSample(file1, Sound.VOL_MAX);   
@@ -90,7 +99,9 @@ public class ev3Client {
             leftMotor.stop();
              
             leftMotor.setSpeed(armDownSpeed);
-             
+            int color1 = getColor();
+            
+            
             leftMotor.backward();
             Delay.msDelay(armLDownDelay);
             leftMotor.stop();
@@ -102,12 +113,14 @@ public class ev3Client {
             rightMotor.stop();
             
             rightMotor.setSpeed(armDownSpeed);
-             
+            
+            int color2 = getColor2();
+            
             rightMotor.backward();
             Delay.msDelay(armRDownDelay);
             rightMotor.stop();
             
-            clothList.add(new Clothes(getColor(), curState));
+            
              
             centerMotor.forward();
             Delay.msDelay(tailUpDelay);
@@ -122,6 +135,14 @@ public class ev3Client {
             leftMotor.setSpeed(armSpeed);
             rightMotor.setSpeed(armSpeed);
             centerMotor.setSpeed(tailSpeed);
+            
+            if (color2 == -1){
+               clothList.add(new Clothes(color2, curState));
+            }
+            else{
+               clothList.add(new Clothes(color1, curState));
+            }
+            
          } while(true);
       }
 
@@ -130,18 +151,18 @@ public class ev3Client {
          Sound.playSample(file2, Sound.VOL_MAX); 
          //모드 저장
          while (true){ 
-            //1번 모드선택 //2번째가 main function return 하는거//3번째가 fold function return하는거
-            if (execute() == 1) {
+            // 1 => folding 2=> recommend 3=> out
+            mode = selectMode();
+            if (mode == 2){
+               recommend();
+               continue; 
+               //recommend
+            }
+            if (mode == 3) {
                if (socket != null) socket.close();
                if(streamOut != null) streamOut.close();
                if (streamIn != null) streamIn.close();
                break;
-            }
-            mode = selectMode();
-            if (mode == 1){
-               recommend();
-               continue; 
-               //recommend
             }
             else {          
                curState = detected(); //카메라가 상의 하의 or detect 못함. 상의는 1 하의는 2 없으면 0
@@ -166,94 +187,139 @@ public class ev3Client {
          System.out.printf(" \n color id is = %d \n", temp);
          return color_sensor.getColorID();
       }
+      
+      public static int getColor2() {
+          int temp = color_sensor2.getColorID();
+          System.out.printf(" \n color id is = %d \n", temp);
+          return color_sensor2.getColorID();
+       }
 
       public static int selectMode() {
-         final SampleProvider sp = touch.getTouchMode();
-         final SampleProvider esp = escapeTouch.getTouchMode();
-         float[] touchValue = new float[touch.sampleSize()];
-         float[] etouchValue = new float[escapeTouch.sampleSize()];
-         sp.fetchSample(touchValue, 0)   ;
-         esp.fetchSample(etouchValue, 0);
-         touchValue = new float[touch.sampleSize()];
-         etouchValue = new float[escapeTouch.sampleSize()];
-         sp.fetchSample(touchValue, 0);
-         esp.fetchSample(etouchValue, 0);
-         while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
-             sp.fetchSample(touchValue, 0);
-             esp.fetchSample(etouchValue, 0);
-             Delay.msDelay(100);
-         }
-         if (etouchValue[0] != 0.0){
-            File file3=new File("recommend_mode.wav");
-            Sound.playSample(file3, Sound.VOL_MAX); 
-            return 1;
-         }
-         else {
-            File file4=new File("folding_mode.wav");
-            Sound.playSample(file4, Sound.VOL_MAX); 
-            return 0;
-         }
+//         final SampleProvider sp = touch.getTouchMode();
+//         final SampleProvider esp = escapeTouch.getTouchMode();
+//         float[] touchValue = new float[touch.sampleSize()];
+//         float[] etouchValue = new float[escapeTouch.sampleSize()];
+//         sp.fetchSample(touchValue, 0)   ;
+//         esp.fetchSample(etouchValue, 0);
+//         touchValue = new float[touch.sampleSize()];
+//         etouchValue = new float[escapeTouch.sampleSize()];
+//         sp.fetchSample(touchValue, 0);
+//         esp.fetchSample(etouchValue, 0);
+//         while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
+//             sp.fetchSample(touchValue, 0);
+//             esp.fetchSample(etouchValue, 0);
+//             Delay.msDelay(100);
+//         }
+//         if (etouchValue[0] != 0.0){
+//            File file3=new File("recommend_mode.wav");
+//            Sound.playSample(file3, Sound.VOL_MAX); 
+//            return 1;
+//         }
+//         else {
+//            File file4=new File("folding_mode.wav");
+//            Sound.playSample(file4, Sound.VOL_MAX); 
+//            return 0;
+//         }
+            
+               while(true){
+                  final int remoteCommand = infraredSensor.getRemoteCommand(0);
+                  switch (remoteCommand){
+                     case 0:
+                        
+                        continue;
+                     case 1:
+                        return 1;
+                     case 2:
+                        return 2;
+                     case 3:
+                        return 3;
+                     case 4:
+                        return 4;
+                  }
+               }
+         
       }
 
       public static int execute(){ //
-         final SampleProvider sp = touch.getTouchMode();
-         final SampleProvider esp = escapeTouch.getTouchMode();
-         float[] touchValue = new float[touch.sampleSize()];
-         float[] etouchValue = new float[escapeTouch.sampleSize()];
-         sp.fetchSample(touchValue, 0)   ;
-         esp.fetchSample(etouchValue, 0);
-         touchValue = new float[touch.sampleSize()];
-         etouchValue = new float[escapeTouch.sampleSize()];
-         sp.fetchSample(touchValue, 0);
-         esp.fetchSample(etouchValue, 0);
-         while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
-            sp.fetchSample(touchValue, 0);      
-            esp.fetchSample(etouchValue, 0);
-            Delay.msDelay(100);
-         }
-         if (etouchValue[0] != 0.0){
-            File file3=new File("recommend_mode.wav"); //exit program
-            Sound.playSample(file3, Sound.VOL_MAX); 
-            return 1;
-         }
-         else {
-            File file4=new File("folding_mode.wav"); //start program
-            Sound.playSample(file4, Sound.VOL_MAX); 
-            return 0;
-         }
+         while(true){
+              final int remoteCommand = infraredSensor.getRemoteCommand(0);
+              switch (remoteCommand){
+                 case 0:
+                    
+                    continue;
+                 case 1:
+                    return 1;
+                 case 2:
+                    return 2;
+                 case 3:
+                    return 3;
+                 case 4:
+                    return 4;
+              }
+           }
+     
       }
       public static int contfold(){ //
-         final SampleProvider sp = touch.getTouchMode();
-         final SampleProvider esp = escapeTouch.getTouchMode();
-         float[] touchValue = new float[touch.sampleSize()];
-         float[] etouchValue = new float[escapeTouch.sampleSize()];
-         sp.fetchSample(touchValue, 0)   ;
-         esp.fetchSample(etouchValue, 0);
-         touchValue = new float[touch.sampleSize()];
-         etouchValue = new float[escapeTouch.sampleSize()];
-         sp.fetchSample(touchValue, 0);
-         esp.fetchSample(etouchValue, 0);
-         while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
-            sp.fetchSample(touchValue, 0);       
-            esp.fetchSample(etouchValue, 0);
-            Delay.msDelay(100);
-         }
-         if(etouchValue[0] != 0.0){
-            File file3=new File("recommend_mode.wav"); //finish folding
-            Sound.playSample(file3, Sound.VOL_MAX); 
-            return 1;
-         }
-         else {
-            File file4=new File("folding_mode.wav"); //continue folding
-            Sound.playSample(file4, Sound.VOL_MAX); 
-            return 0;
-         }
+         while(true){
+              final int remoteCommand = infraredSensor.getRemoteCommand(0);
+              switch (remoteCommand){
+                 case 0:
+                    
+                    continue;
+                 case 1:
+                    return 1;
+                 case 2:
+                    return 2;
+                 case 3:
+                    return 3;
+                 case 4:
+                    return 4;
+              }
+           }
+         
       }
 
       public static int detected(){ //옷이 detect 됨
-         //상의면 1 하의면 2 detected 안되면 0
-         //이게 ML 사용하는거 
-         return 1;
+         public static String getWeather()throws Exception {
+           try {
+              
+              socket = new Socket(serverAddress, serverPort);
+              lcd.clear();
+              
+              streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+              
+              streamOut = new DataOutputStream(socket.getOutputStream());
+              
+           }catch(UnknownHostException uhe) {
+              lcd.drawString("Host unknown: "+uhe.getMessage(), 1, 1);
+           }
+           String sendM = "";
+           String recvM = "";
+           int cnt =0;
+              try{
+                  cnt += 1;
+                  sendM = "0";
+                  streamOut.writeUTF(sendM);
+                  streamOut.flush();
+                 
+                  recvM = streamIn.readUTF();
+                  System.out.printf("weather is %s", recvM);
+                 
+                  Thread.sleep(1000);
+               } catch(IOException ioe){
+                  lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
+               }
+            if (ecvM.equalsIgnoreCase("Top")){
+               return 1;
+            }
+            else if (ecvM.equalsIgnoreCase("Bottom")){
+               return 2;
+            }
+            else{
+               System.out.println("Other detected");
+               return 0; 
+            }
+       }      
       }
        
       public static void recommend() throws Exception{
@@ -580,12 +646,12 @@ public class ev3Client {
        }
        public static String getWeather()throws Exception {
            try {
-              lcd.clear();
               
               socket = new Socket(serverAddress, serverPort);
               lcd.clear();
               
               streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+              
               streamOut = new DataOutputStream(socket.getOutputStream());
               
            }catch(UnknownHostException uhe) {
@@ -596,7 +662,7 @@ public class ev3Client {
            int cnt =0;
               try{
                   cnt += 1;
-                  sendM = "fuck this up" + cnt;
+                  sendM = "1";
                   streamOut.writeUTF(sendM);
                   streamOut.flush();
                  
