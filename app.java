@@ -38,7 +38,6 @@ public class ev3Client {
          this.color = color;
          this.type = type;
       }
-
    }
       
 	private static EV3TouchSensor touch = new EV3TouchSensor(SensorPort.S1);
@@ -63,6 +62,7 @@ public class ev3Client {
           RegulatedMotor leftMotor = Motor.A;
           RegulatedMotor rightMotor = Motor.B;
           RegulatedMotor centerMotor = Motor.C;
+
           int armSpeed = 1080;
           int armDownSpeed = 100;
           int tailSpeed = 1080;
@@ -122,9 +122,9 @@ public class ev3Client {
             leftMotor.setSpeed(armSpeed);
             rightMotor.setSpeed(armSpeed);
             centerMotor.setSpeed(tailSpeed);
-            
          } while(true);
       }
+
       public static void main(String arg[]) throws Exception{
          File file2=new File("intro.wav");
          Sound.playSample(file2, Sound.VOL_MAX); 
@@ -167,7 +167,7 @@ public class ev3Client {
          return color_sensor.getColorID();
       }
 
-       public static int selectMode() {
+      public static int selectMode() {
          final SampleProvider sp = touch.getTouchMode();
          final SampleProvider esp = escapeTouch.getTouchMode();
          float[] touchValue = new float[touch.sampleSize()];
@@ -180,11 +180,10 @@ public class ev3Client {
          esp.fetchSample(etouchValue, 0);
          while(touchValue[0] == 0.0 && etouchValue[0] == 0.0) {
              sp.fetchSample(touchValue, 0);
-             
              esp.fetchSample(etouchValue, 0);
              Delay.msDelay(100);
          }
-         if(etouchValue[0] != 0.0){
+         if (etouchValue[0] != 0.0){
             File file3=new File("recommend_mode.wav");
             Sound.playSample(file3, Sound.VOL_MAX); 
             return 1;
@@ -212,13 +211,13 @@ public class ev3Client {
             esp.fetchSample(etouchValue, 0);
             Delay.msDelay(100);
          }
-         if(etouchValue[0] != 0.0){
+         if (etouchValue[0] != 0.0){
             File file3=new File("recommend_mode.wav"); //exit program
             Sound.playSample(file3, Sound.VOL_MAX); 
             return 1;
          }
          else {
-            File file4=new File("folding_mode.wav"); //restart program
+            File file4=new File("folding_mode.wav"); //start program
             Sound.playSample(file4, Sound.VOL_MAX); 
             return 0;
          }
@@ -580,7 +579,6 @@ public class ev3Client {
          Delay.msDelay(1000);
        }
        public static String getWeather()throws Exception {
-          
            try {
               lcd.clear();
               
@@ -607,7 +605,7 @@ public class ev3Client {
                  
                   Thread.sleep(1000);
                } catch(IOException ioe){
-                 lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
+                  lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
                }
             return recvM;
        }      
