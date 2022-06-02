@@ -85,7 +85,7 @@ public class ev3Client {
   
          do{
             int temp = contfold();
-            if (temp == 2) break;
+            if (temp == 3) break;
             
             File file1=new File("folding.wav");
             Sound.playSample(file1, Sound.VOL_MAX);   
@@ -151,18 +151,18 @@ public class ev3Client {
          Sound.playSample(file2, Sound.VOL_MAX); 
          //모드 저장
          while (true){ 
-            //1번 모드선택 //2번째가 main function return 하는거//3번째가 fold function return하는거
-            if (execute() == 2) {
-               if (socket != null) socket.close();
-               if(streamOut != null) streamOut.close();
-               if (streamIn != null) streamIn.close();
-               break;
-            }
+            // 1 => folding 2=> recommend 3=> out
             mode = selectMode();
             if (mode == 2){
                recommend();
                continue; 
                //recommend
+            }
+            if (mode == 3) {
+               if (socket != null) socket.close();
+               if(streamOut != null) streamOut.close();
+               if (streamIn != null) streamIn.close();
+               break;
             }
             else {          
                curState = detected(); //카메라가 상의 하의 or detect 못함. 상의는 1 하의는 2 없으면 0
@@ -280,9 +280,46 @@ public class ev3Client {
       }
 
       public static int detected(){ //옷이 detect 됨
-         //상의면 1 하의면 2 detected 안되면 0
-         //이게 ML 사용하는거 
-         return 1;
+         public static String getWeather()throws Exception {
+           try {
+              
+              socket = new Socket(serverAddress, serverPort);
+              lcd.clear();
+              
+              streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+              
+              streamOut = new DataOutputStream(socket.getOutputStream());
+              
+           }catch(UnknownHostException uhe) {
+              lcd.drawString("Host unknown: "+uhe.getMessage(), 1, 1);
+           }
+           String sendM = "";
+           String recvM = "";
+           int cnt =0;
+              try{
+                  cnt += 1;
+                  sendM = "0";
+                  streamOut.writeUTF(sendM);
+                  streamOut.flush();
+                 
+                  recvM = streamIn.readUTF();
+                  System.out.printf("weather is %s", recvM);
+                 
+                  Thread.sleep(1000);
+               } catch(IOException ioe){
+                  lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
+               }
+            if (ecvM.equalsIgnoreCase("Top")){
+               return 1;
+            }
+            else if (ecvM.equalsIgnoreCase("Bottom")){
+               return 2;
+            }
+            else{
+               System.out.println("Other detected");
+               return 0; 
+            }
+       }      
       }
        
       public static void recommend() throws Exception{
@@ -625,7 +662,7 @@ public class ev3Client {
            int cnt =0;
               try{
                   cnt += 1;
-                  sendM = "fuck this up" + cnt;
+                  sendM = "1";
                   streamOut.writeUTF(sendM);
                   streamOut.flush();
                  
