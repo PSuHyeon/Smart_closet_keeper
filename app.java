@@ -86,10 +86,10 @@ public class ev3Client {
          do{
             int temp = contfold();
             if (temp == 3) break;
-            
-            File file1=new File("folding.wav");
-            Sound.playSample(file1, Sound.VOL_MAX);   
-            
+             
+            File file3 = new File("folding.wav");
+            Sound.playSample(file3, Sound.VOL_MAX);
+ 
             leftMotor.setSpeed(armSpeed);
             rightMotor.setSpeed(armSpeed);
             centerMotor.setSpeed(tailSpeed);
@@ -99,8 +99,8 @@ public class ev3Client {
             leftMotor.stop();
              
             leftMotor.setSpeed(armDownSpeed);
-            int color1 = getColor();
             
+            int color1 = getColor();
             
             leftMotor.backward();
             Delay.msDelay(armLDownDelay);
@@ -119,9 +119,7 @@ public class ev3Client {
             rightMotor.backward();
             Delay.msDelay(armRDownDelay);
             rightMotor.stop();
-            
-            
-             
+                        
             centerMotor.forward();
             Delay.msDelay(tailUpDelay);
             centerMotor.stop();
@@ -147,24 +145,32 @@ public class ev3Client {
       }
 
       public static void main(String arg[]) throws Exception{
-         File file2=new File("intro.wav");
-         Sound.playSample(file2, Sound.VOL_MAX); 
+         File file1 = new File("intro.wav");
+         Sound.playSample(file1, Sound.VOL_MAX);
+
          //모드 저장
          while (true){ 
             // 1 => folding 2=> recommend 3=> out
             mode = selectMode();
             if (mode == 2){
+               File file23 = new File("recommending_mode.wav");
+               Sound.playSample(file23, Sound.VOL_MAX);
                recommend();
                continue; 
                //recommend
             }
             if (mode == 3) {
+               File file20 = new File("exit.wav");
+               Sound.playSample(file20, Sound.VOL_MAX);
                if (socket != null) socket.close();
                if(streamOut != null) streamOut.close();
                if (streamIn != null) streamIn.close();
                break;
             }
-            else {          
+            else {    
+               File file22 = new File("folding_mode.wav");
+               Sound.playSample(file22, Sound.VOL_MAX);
+
                curState = detected(); //카메라가 상의 하의 or detect 못함. 상의는 1 하의는 2 없으면 0
 
                if (curState == 0){
@@ -225,7 +231,6 @@ public class ev3Client {
                   final int remoteCommand = infraredSensor.getRemoteCommand(0);
                   switch (remoteCommand){
                      case 0:
-                        
                         continue;
                      case 1:
                         return 1;
@@ -236,8 +241,7 @@ public class ev3Client {
                      case 4:
                         return 4;
                   }
-               }
-         
+               }  
       }
 
       public static int execute(){ //
@@ -245,7 +249,6 @@ public class ev3Client {
               final int remoteCommand = infraredSensor.getRemoteCommand(0);
               switch (remoteCommand){
                  case 0:
-                    
                     continue;
                  case 1:
                     return 1;
@@ -257,14 +260,14 @@ public class ev3Client {
                     return 4;
               }
            }
-     
       }
       public static int contfold(){ //
          while(true){
+               File file2 = new File("folding_ask.wav");
+               Sound.playSample(file2, Sound.VOL_MAX);
               final int remoteCommand = infraredSensor.getRemoteCommand(0);
               switch (remoteCommand){
                  case 0:
-                    
                     continue;
                  case 1:
                     return 1;
@@ -303,8 +306,41 @@ public class ev3Client {
                   streamOut.flush();
                  
                   recvM = streamIn.readUTF();
-                  System.out.printf("weather is %s", recvM);
-                 
+                  File file6 = new File("current_weather.wav");
+                  Sound.playSample(file6, Sound.VOL_MAX);
+
+                  if (recvM.equalsIgnoreCase("clear")) {
+                     File file7 = new File("clear.wav");
+                     Sound.playSample(file7, Sound.VOL_MAX);
+                  }
+                  else if (recvM.equalsIgnoreCase("drizzle")) {
+                     File file8 = new File("drizzle.wav");
+                     Sound.playSample(file8, Sound.VOL_MAX);
+                  }
+                  else if (recvM.equalsIgnoreCase("rain")) {
+                     File file9 = new File("rain.wav");
+                     Sound.playSample(file9, Sound.VOL_MAX);
+                  }
+                  else if (recvM.equalsIgnoreCase("snow")) {
+                     File file10 = new File("snow.wav");
+                     Sound.playSample(file10, Sound.VOL_MAX);
+                  }
+                  else if (recvM.equalsIgnoreCase("thunderstorm")) {
+                     File file24 = new File("thunderstorm.wav");
+                     Sound.playSample(file24, Sound.VOL_MAX);
+                  }
+                  else if (recvM.equalsIgnoreCase("atmosphere")) {
+                     File file11 = new File("atmoosphere.wav");
+                     Sound.playSample(file11, Sound.VOL_MAX);
+                  }
+                  else if (recvM.equalsIgnoreCase("clounds")) {
+                     File file12 = new File("clouds.wav");
+                     Sound.playSample(file12, Sound.VOL_MAX);
+                  }
+                  else {
+                     System.out.printf("weather is %s", recvM);
+                  }
+
                   Thread.sleep(1000);
                } catch(IOException ioe){
                   lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
@@ -319,32 +355,52 @@ public class ev3Client {
                System.out.println("Other detected");
                return 0; 
             }
-       }      
+         }      
       }
        
       public static void recommend() throws Exception{
+         File file4 = new File("recommending.wav");
+         Sound.playSample(file4, Sound.VOL_MAX);
          int temp = weatherMap.get(getWeather());
          int uprecommend = 0;
          int downrecommend = 0;
          if (temp == 0){
             System.out.println("Recommendation: ");
+            File file5 = new File("recommend_ask.wav");
+            Sound.playSample(file5, Sound.VOL_MAX);
             for (int i = 0; i<clothList.size(); i++){
                if (clothList.get(i).type == 1){
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black shirt");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.BLUE ){
                      System.out.print("blue shirt");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray shirt");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if (upcolor == Color.WHITE){
                      System.out.print("white shirt");
+                     File file17 = new File("white.wav");
+                     Sound.playSample(file17, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                }
@@ -352,18 +408,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black pants");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.BROWN ){
                      System.out.print("brown pants");
+                     File file18 = new File("brown.wav");
+                     Sound.playSample(file18, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray pants");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);                     
                      downrecommend = 1;
                   }
                   else if (upcolor == Color.BLUE){
                      System.out.print("blue pants");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                }
@@ -378,18 +450,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black shirt");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.BLUE ){
                      System.out.print("blue shirt");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray shirt");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);   
                      uprecommend = 1;
                   }
                   else if (upcolor == Color.WHITE){
                      System.out.print("white shirt");
+                     File file17 = new File("white.wav");
+                     Sound.playSample(file17, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                }
@@ -397,14 +485,26 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black pants");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.BLUE ){
                      System.out.print("blue pants");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray pants");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);         
                      downrecommend = 1;
                   }
                }
@@ -420,18 +520,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black shirt");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.BLUE ){
                      System.out.print("blue shirt");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray shirt");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);   
                      uprecommend = 1;
                   }
                   else if (upcolor == Color.WHITE){
                      System.out.print("white shirt");
+                     File file17 = new File("white.wav");
+                     Sound.playSample(file17, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                }
@@ -439,14 +555,26 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black pants");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray pants");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);         
                      downrecommend = 1;
                   }
                   else if (upcolor == Color.BLUE){
                      System.out.print("blue pants");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                }
@@ -461,18 +589,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black shirt");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.BLUE ){
                      System.out.print("blue shirt");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray shirt");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);   
                      uprecommend = 1;
                   }
                   else if (upcolor == Color.WHITE){
                      System.out.print("white shirt");
+                     File file17 = new File("white.wav");
+                     Sound.playSample(file17, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                }
@@ -480,18 +624,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black pants");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.BROWN ){
                      System.out.print("brown pants");
+                     File file18 = new File("brown.wav");
+                     Sound.playSample(file18, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray pants");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);         
                      downrecommend = 1;
                   }
                   else if (upcolor == Color.BLUE){
                      System.out.print("blue pants");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                }
@@ -507,18 +667,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black shirt");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.GREEN){
                      System.out.print("blue shirt");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray shirt");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);   
                      uprecommend = 1;
                   }
                   else if (upcolor == Color.WHITE){
                      System.out.print("white shirt");
+                     File file17 = new File("white.wav");
+                     Sound.playSample(file17, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                }
@@ -526,18 +702,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black pants");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("brown pants");
+                     File file18 = new File("brown.wav");
+                     Sound.playSample(file18, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray pants");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);         
                      downrecommend = 1;
                   }
                   else if (upcolor == Color.BLUE){
                      System.out.print("blue pants");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                }
@@ -554,18 +746,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.YELLOW){
                      System.out.print("yellow shirt");
+                     File file19 = new File("blue.wav");
+                     Sound.playSample(file19, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.BLUE ){
                      System.out.print("blue shirt");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.BROWN ){
                      System.out.print("brown shirt");
+                     File file18 = new File("brown.wav");
+                     Sound.playSample(file18, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if (upcolor == Color.WHITE){
                      System.out.print("white shirt");
+                     File file17 = new File("white.wav");
+                     Sound.playSample(file17, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                }
@@ -573,18 +781,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black pants");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.BROWN ){
                      System.out.print("brown pants");
+                     File file18 = new File("brown.wav");
+                     Sound.playSample(file18, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray pants");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);         
                      downrecommend = 1;
                   }
                   else if (upcolor == Color.BLUE){
                      System.out.print("blue pants");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                }
@@ -599,18 +823,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black shirt");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.BLUE ){
                      System.out.print("blue shirt");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray shirt");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);   
                      uprecommend = 1;
                   }
                   else if (upcolor == Color.WHITE){
                      System.out.print("white shirt");
+                     File file17 = new File("white.wav");
+                     Sound.playSample(file17, Sound.VOL_MAX);
+                     File file13 = new File("top.wav");
+                     Sound.playSample(file13, Sound.VOL_MAX);
                      uprecommend = 1;
                   }
                }
@@ -618,18 +858,34 @@ public class ev3Client {
                   int upcolor = clothList.get(i).color;
                   if (upcolor == Color.BLACK){
                      System.out.print("black pants");
+                     File file15 = new File("black.wav");
+                     Sound.playSample(file15, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.BROWN ){
                      System.out.print("brown pants");
+                     File file18 = new File("brown.wav");
+                     Sound.playSample(file18, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                   else if( upcolor == Color.GRAY ){
                      System.out.print("gray pants");
+                     File file25 = new File("grey.wav");
+                     Sound.playSample(file25, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);         
                      downrecommend = 1;
                   }
                   else if (upcolor == Color.BLUE){
                      System.out.print("blue pants");
+                     File file16 = new File("blue.wav");
+                     Sound.playSample(file16, Sound.VOL_MAX);
+                     File file14 = new File("bottom.wav");
+                     Sound.playSample(file14, Sound.VOL_MAX);
                      downrecommend = 1;
                   }
                }
@@ -638,6 +894,8 @@ public class ev3Client {
                }
             }
          }
+            File file21 = new File("random.wav");
+            Sound.playSample(file21, Sound.VOL_MAX);
 //         System.out.println("no suitable recommendation");
 //         System.out.println("recommending random clothes...");
 //         System.out.println("recommending white shirt");
