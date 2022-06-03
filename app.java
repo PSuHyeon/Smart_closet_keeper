@@ -1,4 +1,4 @@
-package sandbox;
+package ev3Client;
 import lejos.robotics.Color;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Keys;
@@ -38,7 +38,7 @@ import lejos.hardware.sensor.EV3IRSensor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
-public class sandbox {
+public class ev3Client {
    public static class Clothes {
 
       public int color;
@@ -49,8 +49,6 @@ public class sandbox {
          this.type = type;
       }
    }
-
-   public static int cnt = 0;
    public static int curState; //옷 class 저장
    public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
    public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
@@ -86,10 +84,6 @@ public class sandbox {
           int tailDownDelay = 2000;
   
          do{
-            
-            
-            File file1=new File("folding.wav");
-            Sound.playSample(file1, Sound.VOL_MAX);   
             
              
             File file3 = new File("folding.wav");
