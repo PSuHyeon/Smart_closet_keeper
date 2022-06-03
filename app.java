@@ -1,4 +1,4 @@
-package ev3Client;
+package sandbox;
 import lejos.robotics.Color;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Keys;
@@ -38,7 +38,7 @@ import lejos.hardware.sensor.EV3IRSensor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
-public class ev3Client {
+public class sandbox {
    public static class Clothes {
 
       public int color;
@@ -49,6 +49,8 @@ public class ev3Client {
          this.type = type;
       }
    }
+
+   public static int cnt = 0;
    public static int curState; //옷 class 저장
    public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
    public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
@@ -84,8 +86,7 @@ public class ev3Client {
           int tailDownDelay = 2000;
   
          do{
-            int temp = contfold();
-            if (temp == 3) break;
+            
             
             File file1=new File("folding.wav");
             Sound.playSample(file1, Sound.VOL_MAX);   
@@ -142,6 +143,9 @@ public class ev3Client {
             else{
                clothList.add(new Clothes(color1, curState));
             }
+
+            int temp = contfold();
+            if (temp == 3) break;
             
          } while(true);
       }
@@ -279,47 +283,54 @@ public class ev3Client {
          
       }
 
-      public static int detected(){ //옷이 detect 됨
-         public static String getWeather()throws Exception {
-           try {
+      public static int detected() throws IOException{ //옷이 detect 됨
+         //   try {
               
-              socket = new Socket(serverAddress, serverPort);
-              lcd.clear();
+         //      socket = new Socket(serverAddress, serverPort);
+         //      lcd.clear();
               
-              streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+         //      streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
               
-              streamOut = new DataOutputStream(socket.getOutputStream());
+         //      streamOut = new DataOutputStream(socket.getOutputStream());
               
-           }catch(UnknownHostException uhe) {
-              lcd.drawString("Host unknown: "+uhe.getMessage(), 1, 1);
-           }
-           String sendM = "";
-           String recvM = "";
-           int cnt =0;
-              try{
-                  cnt += 1;
-                  sendM = "0";
-                  streamOut.writeUTF(sendM);
-                  streamOut.flush();
+         //   }catch(UnknownHostException uhe) {
+         //      lcd.drawString("Host unknown: "+uhe.getMessage(), 1, 1);
+         //   }
+         //   String sendM = "";
+         //   String recvM = "";
+
+         //      try{
+
+         //          sendM = "0";
+         //          streamOut.writeUTF(sendM);
+         //          streamOut.flush();
                  
-                  recvM = streamIn.readUTF();
-                  System.out.printf("weather is %s", recvM);
+         //          recvM = streamIn.readUTF();
+         //          System.out.printf("weather is %s", recvM);
                  
-                  Thread.sleep(1000);
-               } catch(IOException ioe){
-                  lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
-               }
-            if (ecvM.equalsIgnoreCase("Top")){
-               return 1;
-            }
-            else if (ecvM.equalsIgnoreCase("Bottom")){
-               return 2;
-            }
-            else{
-               System.out.println("Other detected");
-               return 0; 
-            }
-       }      
+         //       } catch(IOException ioe){
+         //          lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
+         //       }
+         //    if (recvM.equalsIgnoreCase("Top")){
+         //       return 1;
+         //    }
+         //    else if (recvM.equalsIgnoreCase("Bottom")){
+         //       return 2;
+         //    }
+         //    else{
+         //       System.out.println("Other detected");
+         //       return 0; 
+         //    } 
+         if (cnt == 0 || cnt ==1 || cnt == 3){
+            cnt ++;
+            return 1;
+         }
+
+         else{
+
+            cnt ++;
+            return 2;
+         }
       }
        
       public static void recommend() throws Exception{
