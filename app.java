@@ -14,12 +14,10 @@ import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 import java.util.ArrayList;
-
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3IRSensor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
-
 import java.util.Arrays;
 import java.util.HashMap; 
 import java.io.BufferedInputStream;
@@ -148,9 +146,9 @@ public class ev3Client {
             }
             int temp = contfold();
             if (temp == 3) {
-           	 File file20 = new File("exit.wav");
-                Sound.playSample(file20, Sound.VOL_MAX);
-           	 break;
+           	   File file20 = new File("exit.wav");
+               Sound.playSample(file20, Sound.VOL_MAX);
+           	   break;
             }
             
          } while(true);
@@ -173,8 +171,6 @@ public class ev3Client {
        int tailDownDelay = 2000;
 
       do{
-         
-          
          File file3 = new File("folding.wav");
          Sound.playSample(file3, Sound.VOL_MAX);
 
@@ -189,8 +185,6 @@ public class ev3Client {
          leftMotor.setSpeed(armDownSpeed);
          
          int color1 = getColor();
-         
-         
          int color2 = getColor();
                      
          centerMotor.forward();
