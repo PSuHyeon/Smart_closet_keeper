@@ -49,7 +49,7 @@ public class ev3Client {
          this.type = type;
       }
    }
-   public static int cnt = 0;
+   public static int count = 0;
    public static int curState; //옷 class 저장
    public static ArrayList<Clothes> clothList = new ArrayList<Clothes>();
    public static HashMap<String, Integer> weatherMap = new HashMap<String, Integer>() {{put("Thunderstorm",0); put("Drizzle",1); put("Rain",2);  put("Snow", 3); put("Atmosphere",4); put("Clear", 5); put("Clouds", 6);}};
@@ -72,7 +72,7 @@ public class ev3Client {
           RegulatedMotor leftMotor = Motor.A;
           RegulatedMotor rightMotor = Motor.B;
           RegulatedMotor centerMotor = Motor.C;
-
+          
           int armSpeed = 1080;
           int armDownSpeed = 100;
           int tailSpeed = 1080;
@@ -83,13 +83,14 @@ public class ev3Client {
           int armRDownDelay = 1700;
           int tailUpDelay = 1300;
           int tailDownDelay = 2000;
-  
+          
          do{
             
-             
+            count ++;
+            int color2;
             File file3 = new File("folding.wav");
             Sound.playSample(file3, Sound.VOL_MAX);
- 
+            Delay.msDelay(3000);  
             leftMotor.setSpeed(armSpeed);
             rightMotor.setSpeed(armSpeed);
             centerMotor.setSpeed(tailSpeed);
@@ -107,18 +108,23 @@ public class ev3Client {
             leftMotor.stop();
             
             leftMotor.setSpeed(armSpeed);
-             
-            rightMotor.forward();
-            Delay.msDelay(armRUpDelay);
-            rightMotor.stop();
             
-            rightMotor.setSpeed(armDownSpeed);
-            
-            int color2 = getColor2();
-            
-            rightMotor.backward();
-            Delay.msDelay(armRDownDelay);
-            rightMotor.stop();
+            if (count != 2 &&  count != 4 ){
+            	rightMotor.forward();
+                Delay.msDelay(armRUpDelay);
+                rightMotor.stop();
+                
+                rightMotor.setSpeed(armDownSpeed);
+                
+                color2 = getColor2();
+                
+                rightMotor.backward();
+                Delay.msDelay(armRDownDelay);
+                rightMotor.stop();
+            }
+            else {
+            	color2 = getColor2();
+            }
                         
             centerMotor.forward();
             Delay.msDelay(tailUpDelay);
@@ -141,9 +147,82 @@ public class ev3Client {
                clothList.add(new Clothes(color1, curState));
             }
             int temp = contfold();
-            if (temp == 3) break;
+            if (temp == 3) {
+           	 File file20 = new File("exit.wav");
+                Sound.playSample(file20, Sound.VOL_MAX);
+           	 break;
+            }
+            
          } while(true);
       }
+   
+   public static void fold2(){   
+       RegulatedMotor leftMotor = Motor.A;
+       RegulatedMotor rightMotor = Motor.B;
+       RegulatedMotor centerMotor = Motor.C;
+
+       int armSpeed = 1080;
+       int armDownSpeed = 100;
+       int tailSpeed = 1080;
+       int tailDownSpeed = 100;
+       int armLUpDelay = 350;
+       int armLDownDelay = 1700;
+       int armRUpDelay = 330;
+       int armRDownDelay = 1700;
+       int tailUpDelay = 1300;
+       int tailDownDelay = 2000;
+
+      do{
+         
+          
+         File file3 = new File("folding.wav");
+         Sound.playSample(file3, Sound.VOL_MAX);
+
+         leftMotor.setSpeed(armSpeed);
+         rightMotor.setSpeed(armSpeed);
+         centerMotor.setSpeed(tailSpeed);
+          
+         leftMotor.forward();
+         Delay.msDelay(armLUpDelay);
+         leftMotor.stop();
+          
+         leftMotor.setSpeed(armDownSpeed);
+         
+         int color1 = getColor();
+         
+         
+         int color2 = getColor();
+                     
+         centerMotor.forward();
+         Delay.msDelay(tailUpDelay);
+         centerMotor.stop();
+          
+         centerMotor.setSpeed(tailDownSpeed);
+          
+         centerMotor.backward();
+         Delay.msDelay(tailDownDelay);
+         centerMotor.stop();
+         
+         leftMotor.setSpeed(armSpeed);
+         rightMotor.setSpeed(armSpeed);
+         centerMotor.setSpeed(tailSpeed);
+         
+         if (color2 == -1){
+            clothList.add(new Clothes(color2, curState));
+         }
+         else{
+            clothList.add(new Clothes(color1, curState));
+         }
+         int temp = contfold();
+         
+         if (temp == 3) {
+        	 File file20 = new File("exit.wav");
+             Sound.playSample(file20, Sound.VOL_MAX);
+        	 break;
+         }
+         
+      } while(true);
+   }
 
       public static void main(String arg[]) throws Exception{
          File file1 = new File("intro.wav");
@@ -152,6 +231,7 @@ public class ev3Client {
          //모드 저장
          while (true){ 
             // 1 => folding 2=> recommend 3=> out
+        	 Delay.msDelay(1000);
             mode = selectMode();
             if (mode == 2){
                File file23 = new File("recommending_mode.wav");
@@ -173,7 +253,7 @@ public class ev3Client {
                Sound.playSample(file22, Sound.VOL_MAX);
 
                curState = detected(); //카메라가 상의 하의 or detect 못함. 상의는 1 하의는 2 없으면 0
-
+               Delay.msDelay(3000);
                if (curState == 0){
                   continue;
                }
@@ -182,7 +262,7 @@ public class ev3Client {
                }
                else{
                   //원래 있던 fold 함수 바지로 바꾼거
-                  fold();
+                  fold2();
                }       
             }
             // mode = 0; //mode 다시 초기화 unreachable error 땜에 잠시 주석처리
@@ -285,14 +365,7 @@ public class ev3Client {
       }
 
       public static int detected() throws IOException{ //옷이 detect 됨
-    	  if (cnt == 0 || cnt == 1 || cnt == 3){
-            cnt ++;
-            return 1;
-         }
-         else {
-            cnt ++;
-            return 2; 
-         }
+    	  	return 1;
 //           try {
 //              
 //              socket = new Socket(serverAddress, serverPort);
@@ -369,7 +442,7 @@ public class ev3Client {
       public static void recommend() throws Exception{
          File file4 = new File("recommending.wav");
          Sound.playSample(file4, Sound.VOL_MAX);
-         int temp = weatherMap.get(getWeather());
+         int temp =  5 ; //weatherMap.get(getWeather());
          int uprecommend = 0;
          int downrecommend = 0;
          if (temp == 0){
@@ -929,15 +1002,13 @@ public class ev3Client {
                }
             }
          }
-            File file21 = new File("random.wav");
-            Sound.playSample(file21, Sound.VOL_MAX);
+
             File file5 = new File("recommend_ask.wav");
             Sound.playSample(file5, Sound.VOL_MAX);
             File file17 = new File("white.wav");
             Sound.playSample(file17, Sound.VOL_MAX);
             File file13 = new File("top.wav");
             Sound.playSample(file13, Sound.VOL_MAX);
-//            System.out.print("black pants");
             File file15 = new File("black.wav");
             Sound.playSample(file15, Sound.VOL_MAX);
             File file14 = new File("bottom.wav");
