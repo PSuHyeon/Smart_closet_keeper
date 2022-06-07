@@ -996,22 +996,7 @@ public class ev3Client {
                }
             }
          }
-
-            File file5 = new File("recommend_ask.wav");
-            Sound.playSample(file5, Sound.VOL_MAX);
-            File file17 = new File("white.wav");
-            Sound.playSample(file17, Sound.VOL_MAX);
-            File file13 = new File("top.wav");
-            Sound.playSample(file13, Sound.VOL_MAX);
-            File file15 = new File("black.wav");
-            Sound.playSample(file15, Sound.VOL_MAX);
-            File file14 = new File("bottom.wav");
-            Sound.playSample(file14, Sound.VOL_MAX);
-            
-//         System.out.println("no suitable recommendation");
-//         System.out.println("recommending random clothes...");
-//         System.out.println("recommending white shirt");
-//         System.out.println("recommending black pants");
+         System.out.println("no suitable recommendation");
          Delay.msDelay(1000);
        }
        public static String getWeather()throws Exception {
