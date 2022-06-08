@@ -84,7 +84,6 @@ public class ev3Client {
           
          do{
             
-            count ++;
             int color2;
             File file3 = new File("folding.wav");
             Sound.playSample(file3, Sound.VOL_MAX);
@@ -106,24 +105,23 @@ public class ev3Client {
             leftMotor.stop();
             
             leftMotor.setSpeed(armSpeed);
-            
-            if (count != 2 &&  count != 4 ){
-            	rightMotor.forward();
-                Delay.msDelay(armRUpDelay);
-                rightMotor.stop();
-                
-                rightMotor.setSpeed(armDownSpeed);
-                
-                color2 = getColor2();
-                
-                rightMotor.backward();
-                Delay.msDelay(armRDownDelay);
-                rightMotor.stop();
+            if (curState == 1){
+               rightMotor.forward();
+               Delay.msDelay(armRUpDelay);
+               rightMotor.stop();
+               
+               rightMotor.setSpeed(armDownSpeed);
+                  
+               color2 = getColor2();
+                  
+               rightMotor.backward();
+               Delay.msDelay(armRDownDelay);
+               rightMotor.stop();
             }
-            else {
-            	color2 = getColor2();
+            else{
+               color2 = getColor2();
             }
-                        
+                  
             centerMotor.forward();
             Delay.msDelay(tailUpDelay);
             centerMotor.stop();
@@ -150,73 +148,12 @@ public class ev3Client {
                Sound.playSample(file20, Sound.VOL_MAX);
            	   break;
             }
+            else{
+               curState = detected();
+            }
             
          } while(true);
       }
-   
-   public static void fold2(){   
-       RegulatedMotor leftMotor = Motor.A;
-       RegulatedMotor rightMotor = Motor.B;
-       RegulatedMotor centerMotor = Motor.C;
-
-       int armSpeed = 1080;
-       int armDownSpeed = 100;
-       int tailSpeed = 1080;
-       int tailDownSpeed = 100;
-       int armLUpDelay = 350;
-       int armLDownDelay = 1700;
-       int armRUpDelay = 330;
-       int armRDownDelay = 1700;
-       int tailUpDelay = 1300;
-       int tailDownDelay = 2000;
-
-      do{
-         File file3 = new File("folding.wav");
-         Sound.playSample(file3, Sound.VOL_MAX);
-
-         leftMotor.setSpeed(armSpeed);
-         rightMotor.setSpeed(armSpeed);
-         centerMotor.setSpeed(tailSpeed);
-          
-         leftMotor.forward();
-         Delay.msDelay(armLUpDelay);
-         leftMotor.stop();
-          
-         leftMotor.setSpeed(armDownSpeed);
-         
-         int color1 = getColor();
-         int color2 = getColor();
-                     
-         centerMotor.forward();
-         Delay.msDelay(tailUpDelay);
-         centerMotor.stop();
-          
-         centerMotor.setSpeed(tailDownSpeed);
-          
-         centerMotor.backward();
-         Delay.msDelay(tailDownDelay);
-         centerMotor.stop();
-         
-         leftMotor.setSpeed(armSpeed);
-         rightMotor.setSpeed(armSpeed);
-         centerMotor.setSpeed(tailSpeed);
-         
-         if (color2 == -1){
-            clothList.add(new Clothes(color2, curState));
-         }
-         else{
-            clothList.add(new Clothes(color1, curState));
-         }
-         int temp = contfold();
-         
-         if (temp == 3) {
-        	 File file20 = new File("exit.wav");
-             Sound.playSample(file20, Sound.VOL_MAX);
-        	 break;
-         }
-         
-      } while(true);
-   }
 
       public static void main(String arg[]) throws Exception{
          File file1 = new File("intro.wav");
@@ -251,15 +188,12 @@ public class ev3Client {
                if (curState == 0){
                   continue;
                }
-               else if (curState == 1){
-                  fold();            
-               }
                else{
                   //원래 있던 fold 함수 바지로 바꾼거
-                  fold2();
+                  fold();
                }       
             }
-            // mode = 0; //mode 다시 초기화 unreachable error 땜에 잠시 주석처리
+            
          }
       }
 
@@ -359,78 +293,77 @@ public class ev3Client {
       }
 
       public static int detected() throws IOException{ //옷이 detect 됨
-    	  	return 1;
-//           try {
-//              
-//              socket = new Socket(serverAddress, serverPort);
-//              lcd.clear();
-//              
-//              streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-//              
-//              streamOut = new DataOutputStream(socket.getOutputStream());
-//              
-//           }catch(UnknownHostException uhe) {
-//              lcd.drawString("Host unknown: "+uhe.getMessage(), 1, 1);
-//           }
-//           String sendM = "";
-//           String recvM = "";
-//           int cnt =0;
-//              try{
-//                  cnt += 1;
-//                  sendM = "0";
-//                  streamOut.writeUTF(sendM);
-//                  streamOut.flush();
-//                 
-//                  recvM = streamIn.readUTF();
-//                  File file6 = new File("current_weather.wav");
-//                  Sound.playSample(file6, Sound.VOL_MAX);
-//
-//                  if (recvM.equalsIgnoreCase("clear")) {
-//                     File file7 = new File("clear.wav");
-//                     Sound.playSample(file7, Sound.VOL_MAX);
-//                  }
-//                  else if (recvM.equalsIgnoreCase("drizzle")) {
-//                     File file8 = new File("drizzle.wav");
-//                     Sound.playSample(file8, Sound.VOL_MAX);
-//                  }
-//                  else if (recvM.equalsIgnoreCase("rain")) {
-//                     File file9 = new File("rain.wav");
-//                     Sound.playSample(file9, Sound.VOL_MAX);
-//                  }
-//                  else if (recvM.equalsIgnoreCase("snow")) {
-//                     File file10 = new File("snow.wav");
-//                     Sound.playSample(file10, Sound.VOL_MAX);
-//                  }
-//                  else if (recvM.equalsIgnoreCase("thunderstorm")) {
-//                     File file24 = new File("thunderstorm.wav");
-//                     Sound.playSample(file24, Sound.VOL_MAX);
-//                  }
-//                  else if (recvM.equalsIgnoreCase("atmosphere")) {
-//                     File file11 = new File("atmoosphere.wav");
-//                     Sound.playSample(file11, Sound.VOL_MAX);
-//                  }
-//                  else if (recvM.equalsIgnoreCase("clouds")) {
-//                     File file12 = new File("clouds.wav");
-//                     Sound.playSample(file12, Sound.VOL_MAX);
-//                  }
-//                  else {
-//                     System.out.printf("weather is %s", recvM);
-//                  }
-//
-//                  
-//               } catch(IOException ioe){
-//                  lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
-//               }
-//            if (recvM.equalsIgnoreCase("Top")){
-//               return 1;
-//            }
-//            else if (recvM.equalsIgnoreCase("Bottom")){
-//               return 2;
-//            }
-//            else{
-//               System.out.println("Other detected");
-//               return 0; 
-//            }   
+          try {
+             
+             socket = new Socket(serverAddress, serverPort);
+             lcd.clear();
+             
+             streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+             
+             streamOut = new DataOutputStream(socket.getOutputStream());
+             
+          }catch(UnknownHostException uhe) {
+             lcd.drawString("Host unknown: "+uhe.getMessage(), 1, 1);
+          }
+          String sendM = "";
+          String recvM = "";
+          int cnt =0;
+             try{
+                 cnt += 1;
+                 sendM = "0";
+                 streamOut.writeUTF(sendM);
+                 streamOut.flush();
+                
+                 recvM = streamIn.readUTF();
+                 File file6 = new File("current_weather.wav");
+                 Sound.playSample(file6, Sound.VOL_MAX);
+
+                 if (recvM.equalsIgnoreCase("clear")) {
+                    File file7 = new File("clear.wav");
+                    Sound.playSample(file7, Sound.VOL_MAX);
+                 }
+                 else if (recvM.equalsIgnoreCase("drizzle")) {
+                    File file8 = new File("drizzle.wav");
+                    Sound.playSample(file8, Sound.VOL_MAX);
+                 }
+                 else if (recvM.equalsIgnoreCase("rain")) {
+                    File file9 = new File("rain.wav");
+                    Sound.playSample(file9, Sound.VOL_MAX);
+                 }
+                 else if (recvM.equalsIgnoreCase("snow")) {
+                    File file10 = new File("snow.wav");
+                    Sound.playSample(file10, Sound.VOL_MAX);
+                 }
+                 else if (recvM.equalsIgnoreCase("thunderstorm")) {
+                    File file24 = new File("thunderstorm.wav");
+                    Sound.playSample(file24, Sound.VOL_MAX);
+                 }
+                 else if (recvM.equalsIgnoreCase("atmosphere")) {
+                    File file11 = new File("atmoosphere.wav");
+                    Sound.playSample(file11, Sound.VOL_MAX);
+                 }
+                 else if (recvM.equalsIgnoreCase("clouds")) {
+                    File file12 = new File("clouds.wav");
+                    Sound.playSample(file12, Sound.VOL_MAX);
+                 }
+                 else {
+                    System.out.printf("weather is %s", recvM);
+                 }
+
+                 
+              } catch(IOException ioe){
+                 lcd.drawString("Sending error: "+ioe.getMessage(), 1, 4);
+              }
+           if (recvM.equalsIgnoreCase("Top")){
+              return 1;
+           }
+           else if (recvM.equalsIgnoreCase("Bottom")){
+              return 2;
+           }
+           else{
+              System.out.println("Other detected");
+              return 0; 
+           }   
       }
        
       public static void recommend() throws Exception{
