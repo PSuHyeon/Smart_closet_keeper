@@ -66,7 +66,7 @@ public class ev3Client {
    public static DataInputStream streamIn = null;
    public static EV3IRSensor infraredSensor = new EV3IRSensor(SensorPort.S2);
       
-   public static void fold(){   
+   public static void fold() throws IOException{   
           RegulatedMotor leftMotor = Motor.A;
           RegulatedMotor rightMotor = Motor.B;
           RegulatedMotor centerMotor = Motor.C;
